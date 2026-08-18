@@ -23,7 +23,7 @@
 | 文件 | 模块 | 作用 |
 | --- | --- | --- |
 | `code/client/Requestor.hpp` | 请求管理模块 | 管理已发送但未完成的请求，通过请求 ID 匹配响应，支持同步等待、异步 future 和回调三种响应处理方式。 |
-| `code/client/RpcCaller​.hpp` | RPC 调用构造模块 | 面向客户端调用方封装 RPC 请求构造、发送和结果解析，把方法名与参数转换为 RPC 请求消息。注意：该文件名中 `RpcCaller` 和 `.hpp` 之间包含一个零宽字符。 |
+| `code/client/RpcCaller​.hpp` | RPC 调用构造模块 | 面向客户端调用方封装 RPC 请求构造、发送和结果解析，把方法名与参数转换为 RPC 请求消息。|
 | `code/client/DiscoverRegistry.hpp` | 客户端服务注册/发现模块 | 提供服务注册请求和服务发现请求逻辑，并在客户端维护方法到服务地址的缓存与简单轮询选择。 |
 | `code/client/PublishSubscribe.hpp` | 客户端发布订阅模块 | 封装主题创建、删除、订阅、取消订阅和发布消息请求，并保存订阅回调用于处理服务端推送。 |
 | `code/client/client.hpp` | 客户端门面模块 | 组合 Requestor、Dispatcher、RpcCaller、服务发现和发布订阅模块，对外提供 RegistryClient、DiscoveryClient、RpcClient、TopicClient 等易用接口。 |
@@ -60,4 +60,4 @@
 - `common/` 是公共基础设施，负责协议字段、抽象接口、消息模型、网络传输、日志和工具函数。
 - `client/` 是客户端功能封装，负责发起 RPC、注册/发现服务、发布/订阅主题以及处理响应。
 - `server/` 是服务端功能封装，负责 RPC 路由、注册中心、主题中转和服务端入口组合。
-- `code/test/` 是示例和测试代码，不属于上述核心 `.hpp` 模块说明范围。
+- `code/test/` 是示例和测试代码demo。
