@@ -3,6 +3,10 @@
 这是一个在 Linux 系统上实现的，基于 Json 和 Muduo 库的 Rpc 组件。
 具体实现过程文档：https://blog.csdn.net/2402_86681376/category_13166697.html
 
+build子目录：muduo库资源
+test子目录：部分语法测试demo
+code子目录：核心内容
+
 ## code 目录模块说明
 
 以下说明覆盖 `code/` 目录中除 `code/test/` 子目录外的所有 `.hpp` 文件。
