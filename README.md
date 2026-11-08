@@ -1,6 +1,7 @@
 # Json_Rpc
 
 这是一个在 Linux 系统上实现的，基于 Json 和 Muduo 库的 Rpc 组件。
+具体实现过程文档：https://blog.csdn.net/2402_86681376/category_13166697.html
 
 ## code 目录模块说明
 
