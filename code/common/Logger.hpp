@@ -8,67 +8,10 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include<pthread.h>
-
-class Mutex
-{
-public:
-    Mutex()
-    {
-        pthread_mutex_init(&_lock, nullptr);
-    }
-    ~Mutex()
-    {
-        pthread_mutex_destroy(&_lock);
-    }
-    void Lock()
-    {
-        pthread_mutex_lock(&_lock);
-    }
-    void Unlock()
-    {
-        pthread_mutex_unlock(&_lock);
-    }
-    pthread_mutex_t* Ptr()
-    {
-        return &_lock;
-    }
-private:
-    pthread_mutex_t _lock;
-};
-
-// RAII风格用法
-class LockGuard
-{
-public:
-    LockGuard(Mutex& lock)
-        :_lockref(lock)
-    {
-        _lockref.Lock();
-    }
-    ~LockGuard()
-    {
-        _lockref.Unlock();
-    }
-private:
-    Mutex& _lockref;
-};
-
-/*
-后续使用我们自己封装的锁时，可以写成：
-{
-    LockGuard lock(mutex);
-    // ...
-    // 临界区
-}
-{}划定作用域, 利用LockGuard自动调用构造析构完成加锁和解锁
-*/
-
 
 // 日志等级
 enum class LogLevel
@@ -113,12 +56,12 @@ class ConsoleStrategy : public LogStrategy
 public:
     void SynLog(const std::string& message) override
     {
-        LockGuard lg(_mutex);
+        std::lock_guard<std::mutex> lg(_mutex);
         std::cout << message << std::endl;
     }
 
 private:
-    Mutex _mutex;
+    std::mutex _mutex;
 };
 
 // 文件写入日志策略
@@ -132,7 +75,7 @@ public:
     {
         // 如果传入的目录和文件不存在则创建
 
-        LockGuard lg(_mutex);
+        std::lock_guard<std::mutex> lg(_mutex);
 
         // C++17引入的std::filesystem库用法
         if (std::filesystem::exists(_logpath))
@@ -149,7 +92,7 @@ public:
 
     void SynLog(const std::string& message) override
     {
-        LockGuard lg(_mutex);
+        std::lock_guard<std::mutex> lg(_mutex);
 
         if (_logpath != "" && _logpath.back() != '/')
         {
@@ -169,7 +112,7 @@ public:
 private:
     std::string _logpath;     // 日志文件所在目录
     std::string _logfilename; // 日志文件名
-    Mutex _mutex;
+    std::mutex _mutex;
 };
 
 // 按等级写入不同文件策略
@@ -180,7 +123,7 @@ public:
     {
         // 如果传入的目录不存在则创建
 
-        LockGuard lg(_mutex);
+        std::lock_guard<std::mutex> lg(_mutex);
 
         // C++17引入的std::filesystem库用法
         if (std::filesystem::exists(_logpath))
@@ -197,7 +140,7 @@ public:
 
     void SynLog(const std::string& message) override
     {
-        LockGuard lg(_mutex);
+        std::lock_guard<std::mutex> lg(_mutex);
 
         if (_logpath != "" && _logpath.back() != '/')
         {
@@ -226,7 +169,7 @@ public:
 private:
     std::string _logpath;
     std::string _logfilename;
-    Mutex _mutex;
+    std::mutex _mutex;
 };
 
 // 获取当前时间方法
@@ -250,15 +193,15 @@ private:
 
 public:
     // 内部类，描述一条完整的日志信息:
-    // [时间][日志等级][进程id][文件名][代码行号] - 内容信息
+    // [时间][日志等级][文件名][代码行号] - 内容信息
     class LogMessage
     {
     public:
         LogMessage(LogLevel level, int line, std::string& filename, Logger& logger)
-            : _cur_time(GetTime()), _level(level), _pid(getpid()), _filename(filename), _line(line), _logger(logger)
+            : _cur_time(GetTime()), _level(level), _filename(filename), _line(line), _logger(logger)
         {
             std::stringstream ss;
-            ss << '[' << _cur_time << ']' << '[' << LogLevel2String(_level) << ']' << '[' << _pid << ']' << '['
+            ss << '[' << _cur_time << ']' << '[' << LogLevel2String(_level) << ']' << '['
                << _filename << ']' << '[' << _line << ']' << " - ";
             _loginfo = ss.str();
         }
@@ -281,7 +224,6 @@ public:
     private:
         std::string _cur_time;
         LogLevel _level;
-        pid_t _pid;
         std::string _filename;
         int _line;
         std::string _loginfo;
