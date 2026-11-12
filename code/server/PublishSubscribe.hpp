@@ -38,6 +38,7 @@ namespace RPC
                         break;
                     case TopicOpType::TOPIC_CANCEL: 
                         topicCancel(conn, msg);
+                        break;
                     case TopicOpType::TOPIC_PUBLISH:
                         ret = topicPublish(conn, msg);
                         break;
