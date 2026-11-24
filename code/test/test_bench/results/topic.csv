@@ -1,0 +1,2 @@
+case,pub_ok,pub_total,pub_qps,sub1_recv,sub2_recv
+C1_topic_2subs,50000,50000,6585.98,50000,50000

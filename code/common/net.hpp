@@ -386,8 +386,8 @@ namespace RPC
             if (conn->connected()) 
             {
                 //LOG(LogLevel::INFO) << "连接建立!";
-                _downlatch.countDown();  //计数--,为0时唤醒阻塞
                 _conn = ConnectionFactory::create(conn, _protocol);
+                _downlatch.countDown();  //计数--,为0时唤醒阻塞
             }
             else 
             {
